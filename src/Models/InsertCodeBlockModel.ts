@@ -1,10 +1,15 @@
 import { App, Editor, SuggestModal } from "obsidian";
 import languages from '../../prismjs-supported-languages.json';
 
-interface Language { title: string; language: string; }
+interface Language {
+  title: string;
+  language: string;
+}
 
 export class InsertCodeBlockModel extends SuggestModal<Language> {
   private editor: Editor;
+  private static recentLanguages: string[] = [];
+  private static readonly MAX_RECENT = 5;
 
   constructor(app: App, editor: Editor) {
     super(app);
@@ -13,22 +18,71 @@ export class InsertCodeBlockModel extends SuggestModal<Language> {
   }
 
   getSuggestions(query: string): Language[] {
-    return languages.filter((language) =>
+    const filtered = languages.filter((language) =>
       language.title.toLowerCase().includes(query.toLowerCase()) ||
       language.language.toLowerCase().includes(query.toLowerCase())
     );
+
+    if (!query.trim()) {
+      const recent = InsertCodeBlockModel.recentLanguages
+        .map(code => languages.find(l => l.language === code))
+        .filter((l): l is Language => l !== undefined);
+
+      const remaining = filtered.filter(
+        l => !InsertCodeBlockModel.recentLanguages.includes(l.language)
+      );
+
+      return [...recent, ...remaining];
+    }
+
+    const recentMatches = filtered.filter(l =>
+      InsertCodeBlockModel.recentLanguages.includes(l.language)
+    );
+    const otherMatches = filtered.filter(l =>
+      !InsertCodeBlockModel.recentLanguages.includes(l.language)
+    );
+
+    return [...recentMatches, ...otherMatches];
   }
 
   renderSuggestion(language: Language, el: HTMLElement) {
-    el.createEl('div', { text: language.title });
-    el.createEl('small', { text: language.language });
+    const isRecent = InsertCodeBlockModel.recentLanguages.includes(language.language);
+
+    const container = el.createEl('div', { cls: 'code-language-suggestion' });
+    const titleEl = container.createEl('div', { text: language.title });
+
+    if (isRecent) {
+      titleEl.createEl('span', {
+        text: ' ⭐',
+        cls: 'recent-indicator'
+      });
+    }
+
+    container.createEl('small', { text: language.language });
   }
 
   private insertCodeBlock(language: string): void {
-    this.editor.replaceSelection(["",
+    this.addToRecent(language);
+
+    this.editor.replaceSelection([
+      "",
       "```" + language,
       this.editor.getSelection(),
-      "```", "",].join("\n"));
+      "```",
+      ""
+    ].join("\n"));
+  }
+
+  private addToRecent(languageCode: string): void {
+    const recent = InsertCodeBlockModel.recentLanguages;
+    const index = recent.indexOf(languageCode);
+    if (index > -1) {
+      recent.splice(index, 1);
+    }
+    recent.unshift(languageCode);
+    if (recent.length > InsertCodeBlockModel.MAX_RECENT) {
+      recent.pop();
+    }
   }
 
   onChooseSuggestion(item: Language, evt: MouseEvent | KeyboardEvent) {
