@@ -1,41 +1,37 @@
-import { App, Editor, FuzzySuggestModal } from "obsidian";
+import { App, Editor, SuggestModal } from "obsidian";
 import languages from '../../prismjs-supported-languages.json';
 
-interface Language {
-  title: string;
-  language: string;
-}
+interface Language { title: string; language: string; }
 
-export class InsertCodeBlockModel extends FuzzySuggestModal<Language> {
+export class InsertCodeBlockModel extends SuggestModal<Language> {
   private editor: Editor;
 
   constructor(app: App, editor: Editor) {
     super(app);
     this.editor = editor;
+    this.setPlaceholder("Type a language name...");
   }
 
-  getItems(): Language[] {
-    return languages;
-  }
-
-  getItemText(book: Language): string {
-    return book.title;
-  }
-  // Perform action on the selected suggestion.
-  onChooseItem(book: Language, evt: MouseEvent | KeyboardEvent) {
-    this.editor.replaceSelection(
-      [
-        "",
-        "```" + book.language,
-        this.editor.getSelection(),
-        "```",
-        "",
-      ].join("\n")
+  getSuggestions(query: string): Language[] {
+    return languages.filter((language) =>
+      language.title.toLowerCase().includes(query.toLowerCase()) ||
+      language.language.toLowerCase().includes(query.toLowerCase())
     );
   }
 
-  onClose() {
-    const { contentEl } = this;
-    contentEl.empty();
+  renderSuggestion(language: Language, el: HTMLElement) {
+    el.createEl('div', { text: language.title });
+    el.createEl('small', { text: language.language });
+  }
+
+  private insertCodeBlock(language: string): void {
+    this.editor.replaceSelection(["",
+      "```" + language,
+      this.editor.getSelection(),
+      "```", "",].join("\n"));
+  }
+
+  onChooseSuggestion(item: Language, evt: MouseEvent | KeyboardEvent) {
+    this.insertCodeBlock(item.language);
   }
 }
