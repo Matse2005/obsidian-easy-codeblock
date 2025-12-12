@@ -1,0 +1,79 @@
+name: Auto-update Prism.js Languages
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download latest JSON from remote repo
+        run: |
+          curl -L \
+            https://raw.githubusercontent.com/Matse2005/prism-supported-languages-json/master/prismjs-supported-languages.json \
+            -o latest.json
+
+      - name: Check for differences
+        id: diff
+        run: |
+          if diff -q latest.json prismjs-supported-languages.json >/dev/null; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop if unchanged
+        if: steps.diff.outputs.changed == 'false'
+        run: echo "No changes detected."
+
+      - name: Update local JSON
+        if: steps.diff.outputs.changed == 'true'
+        run: mv latest.json prismjs-supported-languages.json
+
+      - name: Read current plugin version
+        if: steps.diff.outputs.changed == 'true'
+        id: get_version
+        run: |
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bump patch version
+        if: steps.diff.outputs.changed == 'true'
+        id: bump
+        run: |
+          OLD="${{ steps.get_version.outputs.version }}"
+          IFS='.' read -r A B C <<< "$OLD"
+          NEW="$A.$B.$((C+1))"
+          jq ".version = \"$NEW\"" manifest.json > manifest.tmp.json
+          mv manifest.tmp.json manifest.json
+          echo "new_version=$NEW" >> $GITHUB_OUTPUT
+
+      - name: Commit changes
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add prismjs-supported-languages.json manifest.json
+          git commit -m "Update Prism.js languages (auto) v${{ steps.bump.outputs.new_version }}"
+          git push
+
+      - name: Release new version
+        if: steps.diff.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.bump.outputs.new_version }}"
+          name: "v${{ steps.bump.outputs.new_version }}"
+          body: "Automated Prism.js language update."
+          files: |
+            main.js
+            manifest.json
+            prismjs-supported-languages.json
+            styles.css
