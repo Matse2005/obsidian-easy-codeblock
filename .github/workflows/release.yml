@@ -1,6 +1,8 @@
 name: Release Obsidian plugin
+
 on:
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -9,8 +11,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history for changelog generation
 
       - name: Read current plugin version
         id: get_version
@@ -33,71 +33,6 @@ jobs:
           npm install
           npm run build
 
-      - name: Generate release notes
-        id: release_notes
-        run: |
-          # Get the previous tag
-          PREV_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-
-          # Generate changelog
-          if [ -z "$PREV_TAG" ]; then
-            CHANGELOG=$(git log --pretty=format:"- %s (%an)" --no-merges)
-          else
-            CHANGELOG=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%an)" --no-merges)
-          fi
-
-          # Get unique contributors
-          if [ -z "$PREV_TAG" ]; then
-            CONTRIBUTORS=$(git log --pretty=format:"%an|%ae" --no-merges | sort -u)
-          else
-            CONTRIBUTORS=$(git log ${PREV_TAG}..HEAD --pretty=format:"%an|%ae" --no-merges | sort -u)
-          fi
-
-          # Check for first-time contributors
-          FIRST_TIME=""
-          while IFS='|' read -r name email; do
-            # Count total commits by this author before this release
-            if [ -z "$PREV_TAG" ]; then
-              PREV_COMMITS=0
-            else
-              PREV_COMMITS=$(git log --author="$email" --before="$(git log -1 --format=%ai ${PREV_TAG})" --oneline 2>/dev/null | wc -l)
-            fi
-
-            if [ "$PREV_COMMITS" -eq 0 ]; then
-              if [ -z "$FIRST_TIME" ]; then
-                FIRST_TIME="- @${name}"
-              else
-                FIRST_TIME="${FIRST_TIME}\n- @${name}"
-              fi
-            fi
-          done <<< "$CONTRIBUTORS"
-
-          # Build release body
-          BODY="## 🚀 What's Changed
-
-          $CHANGELOG
-
-          ## 👥 Contributors
-
-          $(echo "$CONTRIBUTORS" | while IFS='|' read -r name email; do echo "- @${name}"; done)
-          "
-
-                    if [ -n "$FIRST_TIME" ]; then
-                      BODY="${BODY}
-          ## 🎉 New Contributors
-
-          ${FIRST_TIME}
-
-          Welcome and thank you for your contributions!
-          "
-                    fi
-
-                    BODY="${BODY}
-
-          # Save to file for multi-line output
-          echo "$BODY" > release_notes.md
-          cat release_notes.md
-
       - name: Commit changes
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -111,7 +46,7 @@ jobs:
         with:
           tag_name: "${{ steps.bump.outputs.new_version }}"
           name: "${{ steps.bump.outputs.new_version }}"
-          body_path: release_notes.md
+          body: "Automated release."
           files: |
             main.js
             manifest.json
