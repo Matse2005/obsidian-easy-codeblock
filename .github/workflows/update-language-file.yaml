@@ -17,14 +17,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
 
       - name: Download latest JSON from remote repo
         run: |
@@ -67,28 +59,19 @@ jobs:
           mv manifest.tmp.json manifest.json
           echo "new_version=$NEW" >> $GITHUB_OUTPUT
 
-      - name: Install dependencies
-        if: steps.diff.outputs.changed == 'true'
-        run: npm ci
-
       - name: Build plugin
-        if: steps.diff.outputs.changed == 'true'
-        run: npm run build
+        run: |
+          npm install
+          npm run build
 
-      - name: Pull latest changes before committing
+      - name: Commit changes
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git fetch origin main
-          git rebase origin/main
-
-      - name: Commit and push changes
-        if: steps.diff.outputs.changed == 'true'
-        run: |
-          git add prismjs-supported-languages.json manifest.json main.js
+          git add prismjs-supported-languages.json manifest.json
           git commit -m "Update Prism.js languages (auto) v${{ steps.bump.outputs.new_version }}"
-          git push origin main
+          git push
 
       - name: Release new version
         if: steps.diff.outputs.changed == 'true'
