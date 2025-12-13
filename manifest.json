@@ -1,11 +1,11 @@
 {
-	"id": "easy-codeblock",
-	"name": "Easy Clodeblock",
-	"version": "1.0.1",
-	"minAppVersion": "0.15.0",
-	"description": "Insert code blocks quick and easily.",
-	"author": "MatseVH",
-	"authorUrl": "https://matsevh.be",
-	"fundingUrl": "https://ko-fi/matsevh",
-	"isDesktopOnly": false
+  "id": "easy-codeblock",
+  "name": "Easy Clodeblock",
+  "version": "1.0.2",
+  "minAppVersion": "0.15.0",
+  "description": "Insert code blocks quick and easily.",
+  "author": "MatseVH",
+  "authorUrl": "https://matsevh.be",
+  "fundingUrl": "https://ko-fi/matsevh",
+  "isDesktopOnly": false
 }
