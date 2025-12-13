@@ -1,4 +1,4 @@
-import { App, Editor } from "obsidian";
+import { App, Editor, Modifier } from "obsidian";
 import { ICommand } from "./BaseCommand";
 
 export class InsertCodeBlockNoLanguage implements ICommand {
@@ -16,7 +16,13 @@ export class InsertCodeBlockNoLanguage implements ICommand {
           "```",
           ""
         ].join("\n"));
-      }
+      },
+      hotkeys: [
+        {
+          modifiers: ["Alt"] as Modifier[],
+          key: "p"
+        }
+      ]
     };
   }
 }

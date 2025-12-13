@@ -1,4 +1,4 @@
-import { App, Editor } from "obsidian";
+import { App, Editor, Modifier } from "obsidian";
 import { ICommand } from "./BaseCommand";
 import { InsertCodeBlockModel } from "../Modals/InsertCodeBlockModel";
 
@@ -11,7 +11,13 @@ export class InsertCodeBlock implements ICommand {
       name: 'Insert code block',
       editorCallback: (editor: Editor) => {
         new InsertCodeBlockModel(this.app, editor).open();
-      }
+      },
+      hotkeys: [
+        {
+          modifiers: ["Alt"] as Modifier[],
+          key: "k"
+        }
+      ]
     };
   }
 }
