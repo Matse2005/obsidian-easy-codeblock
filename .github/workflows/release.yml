@@ -12,9 +12,6 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Update local JSON
-        run: mv latest.json prismjs-supported-languages.json
-
       - name: Read current plugin version
         id: get_version
         run: |
