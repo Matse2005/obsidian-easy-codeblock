@@ -15,7 +15,7 @@ export class InsertCodeBlock implements ICommand {
       hotkeys: [
         {
           modifiers: ["Alt"] as Modifier[],
-          key: "k"
+          key: "l"
         }
       ]
     };
