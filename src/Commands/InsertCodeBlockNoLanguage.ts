@@ -7,7 +7,7 @@ export class InsertCodeBlockNoLanguage implements ICommand {
   getCommandDefinition() {
     return {
       id: 'insert-code-block-no-language',
-      name: 'Insert Code Block (No Language)',
+      name: 'Insert code block (no language)',
       editorCallback: (editor: Editor) => {
         editor.replaceSelection([
           "",
