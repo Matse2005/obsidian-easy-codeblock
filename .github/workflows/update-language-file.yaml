@@ -77,8 +77,8 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v${{ steps.bump.outputs.new_version }}"
-          name: "v${{ steps.bump.outputs.new_version }}"
+          tag_name: "${{ steps.bump.outputs.new_version }}"
+          name: "${{ steps.bump.outputs.new_version }}"
           body: "Automated Prism.js language update."
           files: |
             main.js
