@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for proper rebasing
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -72,14 +74,31 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         run: npm run build
 
-      - name: Commit changes
+      - name: Commit and push changes
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           git add prismjs-supported-languages.json manifest.json main.js
           git commit -m "Update Prism.js languages (auto) v${{ steps.bump.outputs.new_version }}"
-          git push
+
+          # Pull with rebase to handle any remote changes
+          git pull --rebase origin main
+
+          # Push with retry logic
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          until git push origin main || [ $RETRY_COUNT -eq $MAX_RETRIES ]; do
+            RETRY_COUNT=$((RETRY_COUNT+1))
+            echo "Push failed, retrying ($RETRY_COUNT/$MAX_RETRIES)..."
+            git pull --rebase origin main
+            sleep 2
+          done
+
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "Failed to push after $MAX_RETRIES attempts"
+            exit 1
+          fi
 
       - name: Release new version
         if: steps.diff.outputs.changed == 'true'
