@@ -99,13 +99,13 @@ CoffeeScript
 ### From Obsidian Community Plugins
 
 1. Open Settings → Community Plugins
-2. Search for "Code Block Inserter"
+2. Search for "Easy Codeblock"
 3. Click Install, then Enable
 
 ### Manual Installation
 
 1. Download the latest release
-2. Extract to `.obsidian/plugins/code-block-inserter/`
+2. Extract to `.obsidian/plugins/easy-codeblock/`
 3. Reload Obsidian
 4. Enable in Settings → Community Plugins
 
@@ -114,7 +114,7 @@ CoffeeScript
 Don't like Alt + L and Alt + P?
 
 1. Go to Settings → Hotkeys
-2. Search for "Insert code block"
+2. Search for "Easy Codeblock"
 3. Set your preferred shortcuts
 
 ## 🎨 Supported Languages
