@@ -83,7 +83,7 @@ export class InsertCodeBlockModel extends SuggestModal<Language> {
 
     this.editor.replaceSelection([
       ...prefixNewlines,
-      "```",
+      "```" + language,
       selection,
       "```",
       ""
