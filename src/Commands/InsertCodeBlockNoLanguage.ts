@@ -8,6 +8,7 @@ export class InsertCodeBlockNoLanguage implements ICommand {
     return {
       id: 'insert-code-block-no-language',
       name: 'Insert code block (no language)',
+      icon: "message-square",
       editorCallback: (editor: Editor) => {
         const selection = editor.getSelection();
         const hasSelection = selection.length > 0;

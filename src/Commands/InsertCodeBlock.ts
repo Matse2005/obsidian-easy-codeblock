@@ -9,6 +9,7 @@ export class InsertCodeBlock implements ICommand {
     return {
       id: 'insert-code-block',
       name: 'Insert code block',
+      icon: "message-square-code",
       editorCallback: (editor: Editor) => {
         new InsertCodeBlockModel(this.app, editor).open();
       },
