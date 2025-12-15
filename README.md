@@ -109,7 +109,16 @@ CoffeeScript
 3. Reload Obsidian
 4. Enable in Settings → Community Plugins
 
-## ⌨️ Customizing Hotkeys
+## ⌨️ Keyboard Usage
+
+### Adding to toolbar
+
+1. Open a note and tap inside the editing area to show the toolbar.
+2. Tap the `configure mobile toolbar (wrench icon)` button.
+3. Find `Easy Code Block: Insert code block` and/or `Easy Code Block: Insert code block (no language)` and add it to `Manage toolbar options` by clicking the plus icon.
+4. If you can't find it, scroll to the bottom. In the `Add global command` section, search for `Easy Code Block: Insert code block` and/or `Easy Code Block: Insert code block (no language)`.
+
+### Customizing Hotkeys
 
 Don't like Alt + L and Alt + P?
 
