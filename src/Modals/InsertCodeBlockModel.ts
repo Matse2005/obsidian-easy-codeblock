@@ -67,32 +67,19 @@ export class InsertCodeBlockModel extends SuggestModal<Language> {
     const selection = this.editor.getSelection();
     const hasSelection = selection.length > 0;
 
-    const cursor = this.editor.getCursor();
-    const currentLine = this.editor.getLine(cursor.line) ?? "";
-    const prevLine =
-      cursor.line > 0 ? this.editor.getLine(cursor.line - 1) ?? "" : "";
-
-    const currentEmpty = currentLine.trim().length === 0;
-    const prevEmpty = prevLine.trim().length === 0;
-
-    let prefixNewlines: string[] = [];
-
-    if (!currentEmpty) {
-      prefixNewlines = prevEmpty ? [""] : ["", ""];
-    }
-
     this.editor.replaceSelection([
-      ...prefixNewlines,
+      "",
       "```" + language,
       selection,
       "```",
-      ""
+      "",
+      hasSelection ? "" : null
     ].join("\n"));
 
     this.editor.setCursor(
       !hasSelection
-        ? this.editor.getCursor().line - 2
-        : this.editor.getCursor().line + 1
+        ? this.editor.getCursor().line - 3
+        : this.editor.getCursor()
     );
   }
 
