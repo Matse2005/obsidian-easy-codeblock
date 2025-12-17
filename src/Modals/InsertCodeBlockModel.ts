@@ -1,5 +1,6 @@
 import { App, Editor, SuggestModal } from "obsidian";
 import languages from '../../prismjs-supported-languages.json';
+import { CreateCodeBlockHelper } from "src/Helpers/CreateCodeBlockHelper";
 
 interface Language {
   title: string;
@@ -63,24 +64,7 @@ export class InsertCodeBlockModel extends SuggestModal<Language> {
 
   private insertCodeBlock(language: string): void {
     this.addToRecent(language);
-
-    const selection = this.editor.getSelection();
-    const hasSelection = selection.length > 0;
-
-    this.editor.replaceSelection([
-      "",
-      "```" + language,
-      selection,
-      "```",
-      "",
-      hasSelection ? "" : null
-    ].join("\n"));
-
-    this.editor.setCursor(
-      !hasSelection
-        ? this.editor.getCursor().line - 3
-        : this.editor.getCursor()
-    );
+    CreateCodeBlockHelper.generate(this.editor, language);
   }
 
   private addToRecent(languageCode: string): void {

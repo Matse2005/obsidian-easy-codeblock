@@ -1,5 +1,6 @@
 import { App, Editor, Modifier } from "obsidian";
 import { ICommand } from "./BaseCommand";
+import { CreateCodeBlockHelper } from "src/Helpers/CreateCodeBlockHelper";
 
 export class InsertCodeBlockNoLanguage implements ICommand {
   constructor(private app: App) { }
@@ -10,23 +11,7 @@ export class InsertCodeBlockNoLanguage implements ICommand {
       name: 'Insert code block (no language)',
       icon: "message-square",
       editorCallback: (editor: Editor) => {
-        const selection = editor.getSelection();
-        const hasSelection = selection.length > 0;
-
-        editor.replaceSelection([
-          "",
-          "```",
-          selection,
-          "```",
-          "",
-          hasSelection ? "" : null
-        ].join("\n"));
-
-        editor.setCursor(
-          !hasSelection
-            ? editor.getCursor().line - 3
-            : editor.getCursor()
-        );
+        CreateCodeBlockHelper.generate(editor);
       },
 
       hotkeys: [
