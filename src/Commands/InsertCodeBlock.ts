@@ -2,6 +2,7 @@ import { Editor, Modifier, Platform } from "obsidian";
 import type EasyCodeBlock from "../../main";
 import { ICommand } from "./BaseCommand";
 import { InsertCodeBlockModel } from "../Modals/InsertCodeBlockModel";
+import { CreateCodeBlockHelper } from "src/Helpers/CreateCodeBlockHelper";
 
 export class InsertCodeBlock implements ICommand {
   constructor(private plugin: EasyCodeBlock) { }
@@ -12,7 +13,7 @@ export class InsertCodeBlock implements ICommand {
       name: 'Insert code block',
       icon: "message-square-code",
       editorCallback: (editor: Editor) => {
-        new InsertCodeBlockModel(this.plugin, editor).open();
+        new InsertCodeBlockModel(this.plugin, language => CreateCodeBlockHelper.generate(editor, language)).open();
       },
       hotkeys: [
         {

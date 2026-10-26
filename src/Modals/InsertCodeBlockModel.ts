@@ -1,6 +1,5 @@
-import { Editor, SuggestModal, prepareFuzzySearch } from "obsidian";
+import { SuggestModal, prepareFuzzySearch } from "obsidian";
 import languages from '../../prismjs-supported-languages.json';
-import { CreateCodeBlockHelper } from "src/Helpers/CreateCodeBlockHelper";
 import { Language, searchLanguages } from "src/Helpers/LanguageSearch";
 import type EasyCodeBlock from "../../main";
 
@@ -11,12 +10,12 @@ const fuzzyScorer = (query: string) => {
 
 export class InsertCodeBlockModel extends SuggestModal<Language> {
   private plugin: EasyCodeBlock;
-  private editor: Editor;
+  private onChoose: (language: string) => void;
 
-  constructor(plugin: EasyCodeBlock, editor: Editor) {
+  constructor(plugin: EasyCodeBlock, onChoose: (language: string) => void) {
     super(plugin.app);
     this.plugin = plugin;
-    this.editor = editor;
+    this.onChoose = onChoose;
     this.setPlaceholder("Type a language name...");
   }
 
@@ -41,7 +40,7 @@ export class InsertCodeBlockModel extends SuggestModal<Language> {
   }
 
   onChooseSuggestion(item: Language) {
-    CreateCodeBlockHelper.generate(this.editor, item.language);
+    this.onChoose(item.language);
     void this.plugin.addRecentLanguage(item.language);
   }
 }

@@ -8,9 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Read current plugin version
         id: get_version
@@ -41,8 +44,15 @@ jobs:
           git commit -m "Update Prism.js languages (auto) ${{ steps.bump.outputs.new_version }}"
           git push
 
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            manifest.json
+
       - name: Release new version
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: "${{ steps.bump.outputs.new_version }}"
           name: "${{ steps.bump.outputs.new_version }}"

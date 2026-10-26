@@ -56,6 +56,20 @@ your code here
 ```
 ````
 
+### Change the Language of a Code Block
+
+Put your cursor anywhere inside a code block and run **Change code block language** from the Command Palette. Pick a language and only the opening fence changes, anything after the language (like `title=...`) is kept.
+
+### Remove a Code Block
+
+Run **Remove code block (keep code)** with your cursor inside a block. The fences go, the code stays.
+
+### Paste as Code Block
+
+Copy some code, run **Paste as code block** and pick a language. The clipboard contents are inserted inside a new code block.
+
+These three commands have no default hotkey. Assign one under Settings → Hotkeys if you use them often.
+
 ## 🎪 Smart Recents in Action
 
 First time using the plugin? You'll see all languages alphabetically.
