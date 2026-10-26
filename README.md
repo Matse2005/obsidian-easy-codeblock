@@ -1,4 +1,4 @@
-# 🎨 Code Block Inserter for Obsidian
+# Easy Codeblock
 
 > Lightning-fast code block insertion with language selection and smart recents tracking
 
@@ -15,21 +15,22 @@ Stop fumbling with triple backticks and language names! This plugin makes insert
 
 ### ⚡ Lightning-Fast Hotkeys
 
--   **Alt + L** → Insert code block with **Language** picker
--   **Alt + P** → Insert **Plain** code block (no syntax highlighting)
+-   **Alt + L** (Mac: **Ctrl + L**) → Insert code block with **Language** picker
+-   **Alt + P** (Mac: **Ctrl + J**) → Insert **Plain** code block (no syntax highlighting)
 
 ### 💡 Intelligent Behavior
 
--   Wraps selected text automatically
+-   Wraps selected text automatically, even when it already contains code fences
 -   Empty search shows your recent languages first
--   Search prioritizes recent matches at the top
--   Recent languages persist across your session
+-   Search puts an exact match first, then your recent matches
+-   Type any language that isn't listed (like `dataview`) and pick **Use "dataview"**
+-   Recent languages are remembered after restarting Obsidian
 
 ## 🎯 Usage
 
 ### Insert Code Block with Language
 
-1. Press **Alt + L** (or use Command Palette: "Insert code block")
+1. Press **Alt + L** on Windows/Linux or **Ctrl + L** on Mac (or use Command Palette: "Insert code block")
 2. Start typing a language name (e.g., "python", "javascript", "rust")
 3. Hit Enter to insert
 
@@ -47,7 +48,7 @@ hello world
 
 ### Insert Plain Code Block
 
-Press **Alt + P** for instant plain code blocks - perfect for pseudocode, terminal output, or quick snippets.
+Press **Alt + P** (Mac: **Ctrl + J**) for instant plain code blocks - perfect for pseudocode, terminal output, or quick snippets.
 
 ````
 ```
@@ -120,7 +121,7 @@ CoffeeScript
 
 ### Customizing Hotkeys
 
-Don't like Alt + L and Alt + P?
+Don't like the default hotkeys?
 
 1. Go to Settings → Hotkeys
 2. Search for "Easy Codeblock"

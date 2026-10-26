@@ -1,9 +1,10 @@
-import { App, Editor, Modifier } from "obsidian";
+import { Editor, Modifier, Platform } from "obsidian";
+import type EasyCodeBlock from "../../main";
 import { ICommand } from "./BaseCommand";
 import { InsertCodeBlockModel } from "../Modals/InsertCodeBlockModel";
 
 export class InsertCodeBlock implements ICommand {
-  constructor(private app: App) { }
+  constructor(private plugin: EasyCodeBlock) { }
 
   getCommandDefinition() {
     return {
@@ -11,11 +12,12 @@ export class InsertCodeBlock implements ICommand {
       name: 'Insert code block',
       icon: "message-square-code",
       editorCallback: (editor: Editor) => {
-        new InsertCodeBlockModel(this.app, editor).open();
+        new InsertCodeBlockModel(this.plugin, editor).open();
       },
       hotkeys: [
         {
-          modifiers: ["Alt"] as Modifier[],
+          // Option+letter types special characters on macOS (Option+L is "¬")
+          modifiers: [Platform.isMacOS ? "Ctrl" : "Alt"] as Modifier[],
           key: "l"
         }
       ]

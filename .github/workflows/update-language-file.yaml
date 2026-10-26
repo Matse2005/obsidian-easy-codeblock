@@ -83,4 +83,3 @@ jobs:
           files: |
             main.js
             manifest.json
-            prismjs-supported-languages.json

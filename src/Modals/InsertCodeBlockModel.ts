@@ -1,59 +1,37 @@
-import { App, Editor, SuggestModal } from "obsidian";
+import { Editor, SuggestModal, prepareFuzzySearch } from "obsidian";
 import languages from '../../prismjs-supported-languages.json';
 import { CreateCodeBlockHelper } from "src/Helpers/CreateCodeBlockHelper";
+import { Language, searchLanguages } from "src/Helpers/LanguageSearch";
+import type EasyCodeBlock from "../../main";
 
-interface Language {
-  title: string;
-  language: string;
-}
+const fuzzyScorer = (query: string) => {
+  const match = prepareFuzzySearch(query);
+  return (text: string) => match(text)?.score ?? null;
+};
 
 export class InsertCodeBlockModel extends SuggestModal<Language> {
+  private plugin: EasyCodeBlock;
   private editor: Editor;
-  private static recentLanguages: string[] = [];
-  private static readonly MAX_RECENT = 5;
 
-  constructor(app: App, editor: Editor) {
-    super(app);
+  constructor(plugin: EasyCodeBlock, editor: Editor) {
+    super(plugin.app);
+    this.plugin = plugin;
     this.editor = editor;
     this.setPlaceholder("Type a language name...");
   }
 
   getSuggestions(query: string): Language[] {
-    const filtered = languages.filter((language) =>
-      language.title.toLowerCase().includes(query.toLowerCase()) ||
-      language.language.toLowerCase().includes(query.toLowerCase())
-    );
-
-    if (!query.trim()) {
-      const recent = InsertCodeBlockModel.recentLanguages
-        .map(code => languages.find(l => l.language === code))
-        .filter((l): l is Language => l !== undefined);
-
-      const remaining = filtered.filter(
-        l => !InsertCodeBlockModel.recentLanguages.includes(l.language)
-      );
-
-      return [...recent, ...remaining];
-    }
-
-    const recentMatches = filtered.filter(l =>
-      InsertCodeBlockModel.recentLanguages.includes(l.language)
-    );
-    const otherMatches = filtered.filter(l =>
-      !InsertCodeBlockModel.recentLanguages.includes(l.language)
-    );
-
-    return [...recentMatches, ...otherMatches];
+    return searchLanguages(languages, query, this.plugin.recentLanguages, fuzzyScorer);
   }
 
   renderSuggestion(language: Language, el: HTMLElement) {
-    const isRecent = InsertCodeBlockModel.recentLanguages.includes(language.language);
+    const isRecent = this.plugin.recentLanguages.includes(language.language);
 
-    const container = el.createEl('div', { cls: 'code-language-suggestion' });
-    const titleEl = container.createEl('div', { text: language.title });
+    const container = el.createDiv({ cls: 'code-language-suggestion' });
+    const titleEl = container.createDiv({ text: language.title });
 
     if (isRecent) {
-      titleEl.createEl('span', {
+      titleEl.createSpan({
         text: ' ⭐',
         cls: 'recent-indicator'
       });
@@ -62,24 +40,8 @@ export class InsertCodeBlockModel extends SuggestModal<Language> {
     container.createEl('small', { text: language.language });
   }
 
-  private insertCodeBlock(language: string): void {
-    this.addToRecent(language);
-    CreateCodeBlockHelper.generate(this.editor, language);
-  }
-
-  private addToRecent(languageCode: string): void {
-    const recent = InsertCodeBlockModel.recentLanguages;
-    const index = recent.indexOf(languageCode);
-    if (index > -1) {
-      recent.splice(index, 1);
-    }
-    recent.unshift(languageCode);
-    if (recent.length > InsertCodeBlockModel.MAX_RECENT) {
-      recent.pop();
-    }
-  }
-
-  onChooseSuggestion(item: Language, evt: MouseEvent | KeyboardEvent) {
-    this.insertCodeBlock(item.language);
+  onChooseSuggestion(item: Language) {
+    CreateCodeBlockHelper.generate(this.editor, item.language);
+    void this.plugin.addRecentLanguage(item.language);
   }
 }

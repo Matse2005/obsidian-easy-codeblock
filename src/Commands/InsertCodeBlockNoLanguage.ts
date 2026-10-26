@@ -1,4 +1,4 @@
-import { App, Editor, Modifier } from "obsidian";
+import { App, Editor, Modifier, Platform } from "obsidian";
 import { ICommand } from "./BaseCommand";
 import { CreateCodeBlockHelper } from "src/Helpers/CreateCodeBlockHelper";
 
@@ -16,8 +16,10 @@ export class InsertCodeBlockNoLanguage implements ICommand {
 
       hotkeys: [
         {
-          modifiers: ["Alt"] as Modifier[],
-          key: "p"
+          // Option+letter types special characters on macOS, and Ctrl+P is
+          // the editor's "cursor up" binding there, so the Mac default uses J
+          modifiers: [Platform.isMacOS ? "Ctrl" : "Alt"] as Modifier[],
+          key: Platform.isMacOS ? "j" : "p"
         }
       ]
     };
