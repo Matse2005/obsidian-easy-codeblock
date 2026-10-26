@@ -12,8 +12,11 @@ export default class EasyCodeBlock extends Plugin {
 	recentLanguages: string[] = [];
 
 	async onload() {
-		const data: Partial<EasyCodeBlockData> | null = await this.loadData();
-		this.recentLanguages = data?.recentLanguages ?? [];
+		const data = (await this.loadData()) as Partial<EasyCodeBlockData> | null;
+		const recent: unknown = data?.recentLanguages;
+		this.recentLanguages = Array.isArray(recent)
+			? recent.filter((code): code is string => typeof code === "string")
+			: [];
 
 		const registry = new CommandRegistry(this);
 		registry.registerAll();
